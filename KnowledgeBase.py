@@ -61,7 +61,8 @@ class KnowledgeBase(Plugin):
         """处理文件上传"""
         file_content = e_context["context"].content
         file_name = e_context["context"].file_name  # 假设文件名可以从上下文中获取
-        logger.debug(f"Received file content: {file_name}")
+        file_mime_type = e_context["context"].mime_type  # 假设 MIME 类型可以从上下文中获取
+        logger.debug(f"Received file content: {file_name}, MIME type: {file_mime_type}")
 
         if not file_content:
             logger.error("Received empty file")
@@ -75,10 +76,11 @@ class KnowledgeBase(Plugin):
             temp_file.write(file_content)
             temp_file_path = temp_file.name
 
-        # 检查文件扩展名
-        if file_name.endswith('.docx'):
+        # 检查文件扩展名和 MIME 类型
+        if file_name.endswith('.docx') and file_mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             try:
                 # 读取 docx 文件内容
+                from docx import Document  # 添加导入语句
                 doc = Document(temp_file_path)
                 content = '\n'.join([para.text for para in doc.paragraphs])
                 file = {"name": file_name, "content": content}
@@ -88,7 +90,7 @@ class KnowledgeBase(Plugin):
                 e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
                 e_context.action = EventAction.BREAK_PASS
                 return
-        elif file_name.endswith('.json'):
+        elif file_name.endswith('.json') and file_mime_type == 'application/json':
             try:
                 # 尝试将 JSON 文件解析为字典
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
@@ -101,7 +103,7 @@ class KnowledgeBase(Plugin):
                 e_context.action = EventAction.BREAK_PASS
                 return
         else:
-            logger.error(f"Unsupported file type: {file_name}")
+            logger.error(f"Unsupported file type: {file_name}, MIME type: {file_mime_type}")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件类型不支持，请上传 .docx 或 .json 文件")
             e_context.action = EventAction.BREAK_PASS
             return
