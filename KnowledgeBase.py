@@ -60,6 +60,12 @@ class KnowledgeBase(Plugin):
     def _handle_file_upload(self, e_context):
         """处理文件上传"""
         file = e_context["context"].content
+        logger.debug(f"Received file content: {file}")
+        # 检查文件格式是否正确
+        if not isinstance(file, dict) or "name" not in file or "content" not in file:
+            e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
+            e_context.action = EventAction.BREAK_PASS
+            return
         file_name = file["name"]
         content = file["content"]
 
