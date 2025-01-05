@@ -12,7 +12,7 @@ from typing import Dict, Any
     name="KnowledgeBase",
     desc="知识库插件，支持文件上传和查询",
     version="1.0",
-    author="Your Name",
+    author="sllt",
     desire_priority=500
 )
 class KnowledgeBase(Plugin):
@@ -60,8 +60,15 @@ class KnowledgeBase(Plugin):
     def _handle_file_upload(self, e_context):
         """处理文件上传"""
         file = e_context["context"].content
-        logger.debug(f"Received file content: {file}")
-        # 检查文件格式是否正确
+        logger.debug(f"Received file content: {file_content}")
+        try:
+            # 尝试将 JSON 字符串解析为字典
+            file = json.loads(file_content)
+        except json.JSONDecodeError:
+            e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
+            e_context.action = EventAction.BREAK_PASS
+            return
+            # 检查文件格式是否正确
         if not isinstance(file, dict) or "name" not in file or "content" not in file:
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
