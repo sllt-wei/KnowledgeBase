@@ -60,10 +60,10 @@ class KnowledgeBase(Plugin):
     def _handle_file_upload(self, e_context):
         """处理文件上传"""
         file = e_context["context"].content
-        logger.debug(f"Received file content: {file_content}")
+        logger.debug(f"Received file content: {file}")
         try:
             # 尝试将 JSON 字符串解析为字典
-            file = json.loads(file_content)
+            file = json.loads(file)
         except json.JSONDecodeError:
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
