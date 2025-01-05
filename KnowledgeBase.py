@@ -62,8 +62,8 @@ class KnowledgeBase(Plugin):
         file = e_context["context"].content
         logger.debug(f"Received file content: {file}")
 
-        if not file_content:
-            logger.error("Received empty file content")
+        if not file:
+            logger.error("Received empty file")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件内容为空，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
             return
