@@ -72,17 +72,20 @@ class KnowledgeBase(Plugin):
             # 尝试将 JSON 字符串解析为字典
             file = json.loads(file)
             logger.debug(f"Parsed file content: {file}")
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            # 捕获异常并记录
             logger.error(f"Failed to decode JSON: {e}")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
             return
-            # 检查文件格式是否正确
+
+        # 检查文件格式是否正确
         if not isinstance(file, dict) or "name" not in file or "content" not in file:
             logger.error(f"File content is not a valid dictionary or missing 'name' or 'content': {file}")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
             return
+
         file_name = file["name"]
         content = file["content"]
 
