@@ -61,6 +61,13 @@ class KnowledgeBase(Plugin):
         """处理文件上传"""
         file = e_context["context"].content
         logger.debug(f"Received file content: {file}")
+
+        if not file_content:
+            logger.error("Received empty file content")
+            e_context["reply"] = Reply(ReplyType.TEXT, "文件内容为空，请确保上传正确的文件")
+            e_context.action = EventAction.BREAK_PASS
+            return
+
         try:
             # 尝试将 JSON 字符串解析为字典
             file = json.loads(file)
@@ -72,6 +79,7 @@ class KnowledgeBase(Plugin):
             return
             # 检查文件格式是否正确
         if not isinstance(file, dict) or "name" not in file or "content" not in file:
+            logger.error(f"File content is not a valid dictionary or missing 'name' or 'content': {file}")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
             return
