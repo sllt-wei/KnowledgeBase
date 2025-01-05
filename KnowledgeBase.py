@@ -64,7 +64,9 @@ class KnowledgeBase(Plugin):
         try:
             # 尝试将 JSON 字符串解析为字典
             file = json.loads(file)
+            logger.debug(f"Parsed file content: {file}")
         except json.JSONDecodeError:
+            logger.error(f"Failed to decode JSON: {e}")
             e_context["reply"] = Reply(ReplyType.TEXT, "文件格式错误，请确保上传正确的文件")
             e_context.action = EventAction.BREAK_PASS
             return
